@@ -1,0 +1,56 @@
+image: docker:19.03.1
+
+services:
+  - docker:19.03.1-dind
+
+stages:
+  - test
+  - compile
+  - build
+  - deploy
+
+
+test-job:
+  image: ""
+
+  stage: test
+
+  tags:
+        - shell
+        - azure
+
+  only:
+    - master
+
+compile-job:
+  image: ''
+  stage: compile
+
+  tags:
+        - shell
+        - azure
+
+  only:
+    - master
+
+build-job:
+  image: ''
+  stage: build
+
+  tags:
+        - shell
+        - azure
+
+  only:
+    - master
+
+deploy-job:
+  image: ''
+  stage: deploy
+
+  tags:
+        - shell
+        - azure
+
+  only:
+    - master
