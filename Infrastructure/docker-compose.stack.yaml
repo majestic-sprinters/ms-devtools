@@ -1,0 +1,48 @@
+version: '3.2'
+
+services:
+  ms-gateway:
+    image: zhomt/msgateway:latest
+    ports:
+      - '80:80'
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+  # ms-backend:
+  #   image: zhomt/msbackend:latest
+  #   ports:
+  #     - '8080:8080'
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     resources:
+  #       limits:
+  #         cpus: '0.25'
+  #         memory: 256M
+  #       reservations:
+  #         cpus: '0.1'
+  #         memory: 128M
+
+  ms-mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    deploy:
+      mode: global
+
+networks:
+  ms_network:
+    driver: overlay
+    attachable: true
