@@ -37,7 +37,7 @@ resource "azurerm_subnet" "aitu_subnet" {
 
 # Create public IPs
 resource "azurerm_public_ip" "aitu_public_ips" {
-  count               = 3
+  count               = 4
   name                = "publicIP-${count.index}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -99,19 +99,31 @@ resource "azurerm_network_interface" "aitu_docker_nic" {
   }
 }
 
-# Create network interface
-resource "azurerm_network_interface" "aitu_db_nic" {
-  name                = "myNIC"
+resource "azurerm_network_interface" "aitu_mongodb_nic" {
+  name                = "mongodb-nic"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
   ip_configuration {
-    name                          = "my_nic_configuration"
+    name                          = "testConfiguration"
     subnet_id                     = azurerm_subnet.aitu_subnet.id
     private_ip_address_allocation = "Dynamic"
-    #    public_ip_address_id          = element(azurerm_public_ip.aitu_public_ips.*.id, 3)
+    public_ip_address_id          = element(azurerm_public_ip.aitu_public_ips.*.id, 3)
   }
 }
+
+# Create network interface example of creating private IP (not necessary at the moment)
+#resource "azurerm_network_interface" "aitu_db_nic" {
+#  name                = "myNIC"
+#  location            = azurerm_resource_group.rg.location
+#  resource_group_name = azurerm_resource_group.rg.name
+
+#  ip_configuration {
+#    name                          = "my_nic_configuration"
+#    subnet_id                     = azurerm_subnet.aitu_subnet.id
+#    private_ip_address_allocation = "Dynamic"
+#  }
+#}
 
 # Create (and display) an SSH key
 resource "tls_private_key" "example_ssh" {
@@ -164,18 +176,17 @@ resource "azurerm_linux_virtual_machine" "docker-master" {
     username   = "aitu"
     public_key = tls_private_key.example_ssh.public_key_openssh
   }
-
 }
 
-resource "azurerm_linux_virtual_machine" "database-01" {
-  name                  = "db-01"
+resource "azurerm_linux_virtual_machine" "mongodb" {
+  name                  = "mongodb"
   location              = azurerm_resource_group.rg.location
   resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [azurerm_network_interface.aitu_db_nic.id]
+  network_interface_ids = [azurerm_network_interface.aitu_mongodb_nic.id]
   size                  = "Standard_B1s"
 
   os_disk {
-    name                 = "disk-database-01"
+    name                 = "docker-mongodb-disk"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
@@ -187,7 +198,7 @@ resource "azurerm_linux_virtual_machine" "database-01" {
     version   = "latest"
   }
 
-  computer_name                   = "database-01"
+  computer_name                   = "docker-mongodb"
   admin_username                  = "aitu"
   disable_password_authentication = true
   custom_data    = base64encode(data.template_file.linux-dataabase-cloud-init.rendered)
@@ -196,5 +207,4 @@ resource "azurerm_linux_virtual_machine" "database-01" {
     username   = "aitu"
     public_key = tls_private_key.example_ssh.public_key_openssh
   }
-
 }
