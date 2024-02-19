@@ -12,12 +12,12 @@ apt-get -y docker-ce docker-ce-cli containerd.io docker.io docker-compose
 # Install Github's Action Runner
 cd /home/aitu
 mkdir actions-runner && cd actions-runner
-curl -O https://github.com/actions/runner/releases/download/v2.313.0/actions-runner-linux-x64-2.313.0.tar.gz; tar xzf ./actions-runner-linux-x64-2.313.0.tar.gz
-export RUNNER_ALLOW_RUNASROOT="1" && sudo ./config.sh \
+curl -o actions-runner-linux-x64-2.313.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.313.0/actions-runner-linux-x64-2.313.0.tar.gz && tar xzf ./actions-runner-linux-x64-2.313.0.tar.gz
+export RUNNER_ALLOW_RUNASROOT="1" && ./config.sh \
     --unattended \
-    --labels master-0
+    --labels master-0 \
     --url https://github.com/majestic-sprinters/ms-gateway \
-    --token AQ6TNQEOYBQ7F5VXESQXL33F2DQO4 \
+    --token AQ6TNQCPYXISB3MRWEUICRLF2H57W \
     --runnergroup Default && ./svc.sh install root && ./svc.sh start
 
 # Install gitlab-runner
